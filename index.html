@@ -384,57 +384,81 @@ if(sendBtn){
   if(MUSICA_URL !== 'synth') return;
   const audio = document.getElementById('bgAudio'); if(!audio) return;
   audio.removeAttribute('src');
-  let ac = null, master = null, timer = null, paused = true, step = 0, nextT = 0;
-  // Am - F - C - G
-  const chords = [[45,57,60,64],[41,53,57,60],[48,55,60,64],[43,55,59,62]];
+  let ac, bus, organBus, organLP, timer = null, paused = true, bar = 0, nextT = 0;
   const hz = m => 440*Math.pow(2,(m-69)/12);
-  const BAR = 8, FADE = 2.5;
-  function organ(m, t0, vol){
-    // fundamental + octava; los acordes se cruzan con fundido para no tener saltos
-    [[1,'triangle',1],[2,'sine',.35]].forEach(([mult,type,k])=>{
+  // Progresión original en La menor (8 compases por frase)
+  const prog = [[57,60,64],[57,60,64],[53,57,60],[53,57,60],[48,52,55],[48,52,55],[55,59,62],[52,56,59]];
+  const bass = [45,45,41,41,48,48,43,40];
+  const BPM = 92, S16 = 60/BPM/4, BAR = S16*16;
+
+  function piano(m, t0, vol){
+    [[1,'triangle',1],[2,'sine',.25],[3,'sine',.08]].forEach(([mult,type,k])=>{
       const o = ac.createOscillator(), g = ac.createGain();
       o.type = type; o.frequency.value = hz(m)*mult;
       g.gain.setValueAtTime(0, t0);
-      g.gain.linearRampToValueAtTime(vol*k, t0+FADE);
-      g.gain.setValueAtTime(vol*k, t0+BAR);
-      g.gain.linearRampToValueAtTime(0, t0+BAR+FADE);
-      o.connect(g).connect(master); o.start(t0); o.stop(t0+BAR+FADE+.05);
+      g.gain.linearRampToValueAtTime(vol*k, t0+.006);
+      g.gain.exponentialRampToValueAtTime(vol*k*.25, t0+.25);
+      g.gain.exponentialRampToValueAtTime(.0001, t0+1.1);
+      o.connect(g).connect(bus); o.start(t0); o.stop(t0+1.15);
     });
   }
-  function tick(m, t0){
-    const o = ac.createOscillator(), g = ac.createGain();
-    o.type = 'sine'; o.frequency.value = hz(m);
-    g.gain.setValueAtTime(0, t0);
-    g.gain.linearRampToValueAtTime(.035, t0+.015);
-    g.gain.exponentialRampToValueAtTime(.0005, t0+.8);
-    g.gain.linearRampToValueAtTime(0, t0+.85);
-    o.connect(g).connect(master); o.start(t0); o.stop(t0+.9);
+  function organ(m, t0, dur, vol){
+    // tubos: sierra filtrada + dos osciladores levemente desafinados
+    [[1,0],[1,6],[2,-4],[.5,0]].forEach(([mult,det],i)=>{
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = i===3 ? 'sine' : 'sawtooth'; o.frequency.value = hz(m)*mult; o.detune.value = det;
+      const v = vol*(i===3 ? 1.4 : i===2 ? .4 : .55);
+      g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(v, t0+.6);
+      g.gain.setValueAtTime(v, t0+dur);
+      g.gain.linearRampToValueAtTime(0, t0+dur+.8);
+      o.connect(g).connect(organBus); o.start(t0); o.stop(t0+dur+.85);
+    });
   }
-  function bar(t0){
-    const ch = chords[step % 4];
-    ch.forEach((m,i)=>organ(m, t0, i ? .025 : .035));
-    const top = [ch[2]+12, ch[3]+12];
-    for(let k=0;k<16;k++) tick(top[k%2], t0 + k*(BAR/16));
-    step++;
+  function schedBar(t0){
+    const i = bar % 8, phrase = Math.floor(bar/8) % 4;   // 4 frases: crece y vuelve a empezar
+    const ch = prog[i], energy = [.35,.6,.85,1][phrase];
+    // Ostinato de piano en semicorcheas: ida y vuelta por las notas del acorde
+    const pat = [0,1,2,1, 0,1,2,1, 0,1,2,3, 2,1,2,1];
+    for(let k=0;k<16;k++){
+      const n = pat[k]===3 ? ch[0]+12 : ch[pat[k]];
+      piano(n+12, t0+k*S16, (k%4===0 ? .07 : .045)*(.6+energy*.4));
+      if(phrase>=2 && k%2===0) piano(n+24, t0+k*S16, .018*energy);
+    }
+    // Órgano: entra en la 2da frase y se abre a medida que crece
+    if(phrase>=1){
+      ch.forEach(m=>organ(m, t0, BAR, .012*energy));
+      organ(bass[i], t0, BAR, .02*energy);
+      organLP.frequency.setTargetAtTime(500+energy*2500, t0, 2);
+    } else {
+      organ(bass[i], t0, BAR, .012);
+    }
+    bar++;
   }
-  // Agenda con el reloj de audio y margen, así no se corta aunque el celular esté ocupado
-  function pump(){ while(nextT < ac.currentTime + BAR*1.5){ bar(nextT); nextT += BAR; } }
+  function pump(){ while(nextT < ac.currentTime + 3){ schedBar(nextT); nextT += BAR; } }
   function start(){
     if(!ac){
       ac = new (window.AudioContext||window.webkitAudioContext)({latencyHint:'playback'});
-      master = ac.createGain(); master.gain.value = .9;
-      const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2000;
-      const d = ac.createDelay(1), fb = ac.createGain(), wet = ac.createGain();
-      d.delayTime.value = .45; fb.gain.value = .35; wet.gain.value = .35;
+      bus = ac.createGain();
+      organBus = ac.createGain(); organLP = ac.createBiquadFilter();
+      organLP.type = 'lowpass'; organLP.frequency.value = 600; organLP.Q.value = .7;
+      organBus.connect(organLP).connect(bus);
+      // Sala grande: eco múltiple
       const comp = ac.createDynamicsCompressor();
-      comp.threshold.value = -18; comp.knee.value = 12; comp.ratio.value = 6;
-      comp.attack.value = .01; comp.release.value = .3;
-      master.connect(lp); lp.connect(comp); lp.connect(d); d.connect(fb).connect(d); d.connect(wet).connect(comp);
-      comp.connect(ac.destination);
+      comp.threshold.value = -20; comp.knee.value = 10; comp.ratio.value = 5;
+      comp.attack.value = .005; comp.release.value = .25;
+      bus.connect(comp);
+      [[.31,.3],[.47,.25],[.73,.2]].forEach(([dt,fbv])=>{
+        const d = ac.createDelay(1), fb = ac.createGain(), lp = ac.createBiquadFilter(), w = ac.createGain();
+        d.delayTime.value = dt; fb.gain.value = fbv; lp.type = 'lowpass'; lp.frequency.value = 1800; w.gain.value = .22;
+        bus.connect(d); d.connect(lp).connect(fb).connect(d); lp.connect(w).connect(comp);
+      });
+      const out = ac.createGain(); out.gain.value = 2.4;
+      comp.connect(out).connect(ac.destination);
       nextT = ac.currentTime + .1;
     }
     ac.resume();
-    if(!timer){ pump(); timer = setInterval(pump, 1000); }
+    if(!timer){ pump(); timer = setInterval(pump, 500); }
   }
   Object.defineProperty(audio, 'paused', { get: ()=>paused });
   audio.play = function(){ start(); paused = false; audio.dispatchEvent(new Event('play')); return Promise.resolve(); };
