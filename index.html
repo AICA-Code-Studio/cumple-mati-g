@@ -384,51 +384,62 @@ if(sendBtn){
   if(MUSICA_URL !== 'synth') return;
   const audio = document.getElementById('bgAudio'); if(!audio) return;
   audio.removeAttribute('src');
-  let ac = null, master = null, timer = null, paused = true, step = 0;
-  // Am - F - C - G  (voicings graves de órgano)
+  let ac = null, master = null, timer = null, paused = true, step = 0, nextT = 0;
+  // Am - F - C - G
   const chords = [[45,57,60,64],[41,53,57,60],[48,55,60,64],[43,55,59,62]];
   const hz = m => 440*Math.pow(2,(m-69)/12);
-  function organ(m, t0, dur, vol){
-    [1,2,4].forEach((mult,i)=>{
+  const BAR = 8, FADE = 2.5;
+  function organ(m, t0, vol){
+    // fundamental + octava; los acordes se cruzan con fundido para no tener saltos
+    [[1,'triangle',1],[2,'sine',.35]].forEach(([mult,type,k])=>{
       const o = ac.createOscillator(), g = ac.createGain();
-      o.type = i ? 'sine' : 'triangle'; o.frequency.value = hz(m)*mult;
+      o.type = type; o.frequency.value = hz(m)*mult;
       g.gain.setValueAtTime(0, t0);
-      g.gain.linearRampToValueAtTime(vol/(i+1), t0+2.2);
-      g.gain.setValueAtTime(vol/(i+1), t0+dur-2.2);
-      g.gain.linearRampToValueAtTime(0, t0+dur+.5);
-      o.connect(g).connect(master); o.start(t0); o.stop(t0+dur+.6);
+      g.gain.linearRampToValueAtTime(vol*k, t0+FADE);
+      g.gain.setValueAtTime(vol*k, t0+BAR);
+      g.gain.linearRampToValueAtTime(0, t0+BAR+FADE);
+      o.connect(g).connect(master); o.start(t0); o.stop(t0+BAR+FADE+.05);
     });
   }
   function tick(m, t0){
     const o = ac.createOscillator(), g = ac.createGain();
     o.type = 'sine'; o.frequency.value = hz(m);
-    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.05, t0+.01);
-    g.gain.exponentialRampToValueAtTime(.0001, t0+.9);
-    o.connect(g).connect(master); o.start(t0); o.stop(t0+1);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(.035, t0+.015);
+    g.gain.exponentialRampToValueAtTime(.0005, t0+.8);
+    g.gain.linearRampToValueAtTime(0, t0+.85);
+    o.connect(g).connect(master); o.start(t0); o.stop(t0+.9);
   }
-  const BAR = 8; // segundos por acorde
-  function schedule(){
-    const t0 = ac.currentTime + .1, ch = chords[step % 4];
-    ch.forEach((m,i)=>organ(m, t0, BAR, i ? .045 : .06));
+  function bar(t0){
+    const ch = chords[step % 4];
+    ch.forEach((m,i)=>organ(m, t0, i ? .025 : .035));
     const top = [ch[2]+12, ch[3]+12];
     for(let k=0;k<16;k++) tick(top[k%2], t0 + k*(BAR/16));
     step++;
   }
+  // Agenda con el reloj de audio y margen, así no se corta aunque el celular esté ocupado
+  function pump(){ while(nextT < ac.currentTime + BAR*1.5){ bar(nextT); nextT += BAR; } }
   function start(){
     if(!ac){
-      ac = new (window.AudioContext||window.webkitAudioContext)();
-      master = ac.createGain(); master.gain.value = .8;
-      // eco espacial
-      const d = ac.createDelay(), fb = ac.createGain(), lp = ac.createBiquadFilter();
-      d.delayTime.value = .45; fb.gain.value = .45; lp.type = 'lowpass'; lp.frequency.value = 2200;
-      master.connect(lp); lp.connect(ac.destination); lp.connect(d); d.connect(fb).connect(d); d.connect(ac.destination);
+      ac = new (window.AudioContext||window.webkitAudioContext)({latencyHint:'playback'});
+      master = ac.createGain(); master.gain.value = .9;
+      const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2000;
+      const d = ac.createDelay(1), fb = ac.createGain(), wet = ac.createGain();
+      d.delayTime.value = .45; fb.gain.value = .35; wet.gain.value = .35;
+      const comp = ac.createDynamicsCompressor();
+      comp.threshold.value = -18; comp.knee.value = 12; comp.ratio.value = 6;
+      comp.attack.value = .01; comp.release.value = .3;
+      master.connect(lp); lp.connect(comp); lp.connect(d); d.connect(fb).connect(d); d.connect(wet).connect(comp);
+      comp.connect(ac.destination);
+      nextT = ac.currentTime + .1;
     }
     ac.resume();
-    if(!timer){ schedule(); timer = setInterval(schedule, BAR*1000); }
+    if(!timer){ pump(); timer = setInterval(pump, 1000); }
   }
   Object.defineProperty(audio, 'paused', { get: ()=>paused });
   audio.play = function(){ start(); paused = false; audio.dispatchEvent(new Event('play')); return Promise.resolve(); };
   audio.pause = function(){ if(ac) ac.suspend(); paused = true; audio.dispatchEvent(new Event('pause')); };
+  document.addEventListener('visibilitychange', ()=>{ if(!ac || paused) return; document.hidden ? ac.suspend() : ac.resume(); });
 })();
 /* FX-PRO */
 (function(){
