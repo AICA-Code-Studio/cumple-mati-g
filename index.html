@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Festejo mis 24/7 · Mati G</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Marcellus&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary: #d4af37;
+    --accent: #f3e5ab;
+    --gold: #d4af37;
+    --gold-light: #f5e0a3;
+    --black: #0b0b0e;
+    --card-bg: #141419;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{min-height:100%;font-family:'Montserrat',sans-serif;color:#fff;background:var(--black);overflow-x:hidden;}
+  body.locked{overflow:hidden;}
+
+  /* Art Deco background */
+  body::before{
+    content:"";position:fixed;inset:0;
+    background:
+      radial-gradient(circle at 50% 15%, rgba(212,175,55,0.18) 0%, transparent 55%),
+      radial-gradient(circle at 50% 85%, rgba(212,175,55,0.12) 0%, transparent 60%);
+    z-index:0;pointer-events:none;
+  }
+
+  .wrap{position:relative;z-index:2;max-width:440px;margin:0 auto;padding:24px 20px 80px;}
+
+  /* GATE */
+  .gate{
+    position:fixed;inset:0;z-index:999;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:32px;background:#0b0b0e;
+    transition:opacity .6s ease, visibility .6s ease;
+  }
+  .gate.hide{opacity:0;visibility:hidden;pointer-events:none;}
+  .gate-frame{border:2px solid var(--gold);padding:30px 20px;border-radius:14px;position:relative;max-width:320px;width:100%;}
+  .gate-frame::before{content:"";position:absolute;inset:6px;border:1px dashed rgba(212,175,55,0.4);border-radius:8px;}
+  .gate-kicker{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);}
+  .gate-name{font-family:'Cinzel',serif;font-size:clamp(44px,14vw,56px);font-weight:900;color:#fff;margin:8px 0;}
+  .gate-sub{font-size:13px;color:#a0a0b0;line-height:1.6;margin-bottom:24px;}
+  .gate-btns{display:flex;flex-direction:column;gap:12px;width:100%;}
+  .gate-btn{padding:14px;border-radius:30px;border:1px solid var(--gold);background:linear-gradient(135deg,var(--gold),#8e7019);color:#0b0b0e;font-family:'Cinzel';font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;}
+  .gate-btn.ghost{background:transparent;color:var(--gold);}
+
+  /* GATSBY HERO */
+  .gatsby-hero{
+    border:2px solid var(--gold);border-radius:24px;padding:34px 22px;text-align:center;
+    background:var(--card-bg);position:relative;margin-bottom:20px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.7), inset 0 0 25px rgba(212,175,55,0.08);
+  }
+  .gatsby-hero::before{content:"";position:absolute;inset:6px;border:1px solid rgba(212,175,55,0.3);border-radius:18px;pointer-events:none;}
+  .gatsby-tag{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:700;}
+  .gatsby-name{
+    font-family:'Cinzel',serif;font-size:clamp(48px,16vw,66px);font-weight:900;
+    line-height:1;margin:10px 0 6px;
+    background:linear-gradient(135deg,#fff 30%,var(--gold-light) 60%,var(--gold));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .gatsby-age{
+    font-family:'Cinzel',serif;font-size:36px;font-weight:900;color:var(--gold);margin:8px auto;
+    width:70px;height:70px;border-radius:50%;border:2px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(212,175,55,0.3);
+  }
+  .gatsby-date{font-family:'Marcellus',serif;font-size:18px;color:#fff;margin-top:14px;letter-spacing:1px;}
+
+  /* CARDS */
+  .deco-card{
+    background:var(--card-bg);border:1px solid rgba(212,175,55,0.25);border-radius:20px;
+    padding:24px 20px;margin-top:16px;text-align:center;position:relative;
+  }
+  .deco-card h3{font-family:'Cinzel',serif;font-size:17px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+  .deco-card p{font-size:13px;color:#b0b0c5;line-height:1.6;}
+
+  /* COUNTDOWN */
+  .cd-grid{display:flex;justify-content:space-around;gap:8px;margin-top:14px;}
+  .cd-box{flex:1;background:#0b0b0e;padding:12px 6px;border-radius:12px;border:1px solid rgba(212,175,55,0.2);}
+  .cd-num{font-family:'Cinzel',serif;font-size:28px;font-weight:800;color:#fff;line-height:1;}
+  .cd-lbl{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-top:4px;}
+
+  .btn-deco{
+    display:inline-block;padding:12px 26px;border-radius:30px;border:1px solid var(--gold);
+    background:linear-gradient(135deg,var(--gold),#8e7019);color:#0b0b0e;font-family:'Cinzel';font-size:11px;font-weight:800;
+    letter-spacing:.16em;text-transform:uppercase;text-decoration:none;cursor:pointer;margin-top:12px;
+  }
+  .btn-deco.ghost{background:transparent;color:var(--gold);}
+
+  .field{margin-bottom:12px;text-align:left;}
+  .field label{display:block;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+  .field input, .field select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(212,175,55,0.3);background:#0b0b0e;color:#fff;font-family:inherit;font-size:13px;}
+
+  .footer{text-align:center;margin-top:36px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#707085;}
+
+/* POST-EVENT DAY AFTER & COVER PHOTO */
+.post-event-overlay{
+  position:fixed;inset:0;z-index:99999;
+  background:rgba(8,10,18,0.92);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  transition:opacity .4s ease, visibility .4s ease;
+}
+.post-event-overlay.pe-hide{opacity:0;visibility:hidden;pointer-events:none;}
+.pe-card{
+  max-width:380px;width:100%;background:linear-gradient(145deg,#1b1b26,#101018);
+  border:1.5px solid var(--accent,#d4af37);border-radius:26px;padding:32px 22px;
+  text-align:center;box-shadow:0 25px 60px rgba(0,0,0,0.8);color:#fff;
+}
+.pe-stars{font-size:24px;margin-bottom:6px;}
+.pe-badge{
+  display:inline-block;font-size:10px;font-weight:800;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--accent,#d4af37);
+  background:rgba(212,175,55,0.12);padding:5px 14px;border-radius:20px;margin-bottom:12px;
+}
+.pe-title{font-family:inherit;font-size:22px;font-weight:800;margin-bottom:10px;line-height:1.2;color:#fff;}
+.pe-msg{font-size:13px;color:#b0b0c5;line-height:1.6;margin-bottom:24px;}
+.pe-actions{display:flex;flex-direction:column;gap:10px;}
+.pe-btn-upload{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:inherit;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  padding:14px;border-radius:30px;text-decoration:none;cursor:pointer;transition:transform .2s;
+}
+.pe-btn-upload:active{transform:scale(.98);}
+.pe-btn-upload.drive{
+  background:linear-gradient(135deg,var(--accent,#d4af37),#9e7d23);
+  color:#08080c;box-shadow:0 6px 20px rgba(212,175,55,0.3);border:none;
+}
+.pe-btn-upload.wpp{
+  background:#25d366;color:#ffffff;box-shadow:0 6px 20px rgba(37,211,102,0.3);border:none;
+}
+.pe-btn-dismiss{
+  background:transparent;border:1px solid rgba(255,255,255,0.25);
+  color:#fff;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  padding:12px;border-radius:30px;cursor:pointer;margin-top:4px;
+}
+.cover-photo-box{
+  width:100%;max-width:320px;margin:16px auto;border-radius:20px;
+  overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.25);
+  border:2px solid var(--accent,#d4af37);
+}
+.cover-photo-box img{width:100%;height:auto;display:block;object-fit:cover;max-height:360px;}
+
+
+/* FX-PRO */
+#fxSparkles{position:fixed;inset:0;z-index:1;pointer-events:none;}
+.curtain{position:fixed;top:0;bottom:0;width:50.5%;z-index:998;pointer-events:none;
+  background:
+    repeating-linear-gradient(90deg,rgba(212,175,55,0.07) 0 2px,transparent 2px 26px),
+    linear-gradient(180deg,#121218,#07070a);
+  transition:transform 1.6s cubic-bezier(.77,0,.18,1);}
+.curtain.l{left:0;border-right:2px solid var(--gold);box-shadow:inset -30px 0 60px rgba(212,175,55,0.12);}
+.curtain.r{right:0;border-left:2px solid var(--gold);box-shadow:inset 30px 0 60px rgba(212,175,55,0.12);}
+.curtain::after{content:"";position:absolute;top:50%;width:90px;height:90px;margin-top:-45px;
+  border:2px solid var(--gold);transform:rotate(45deg);box-shadow:0 0 30px rgba(212,175,55,0.35);}
+.curtain.l::after{right:-46px;}
+.curtain.r::after{left:-46px;}
+body.opened .curtain.l{transform:translateX(-102%);}
+body.opened .curtain.r{transform:translateX(102%);}
+.gatsby-name{background-size:250% 100%;animation:shimmer 5s linear infinite;}
+@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-150% 0}}
+.gatsby-hero{transform-style:preserve-3d;transition:transform .2s ease-out;overflow:hidden;}
+.gatsby-hero .glare{position:absolute;inset:0;pointer-events:none;border-radius:24px;
+  background:radial-gradient(circle at var(--gx,50%) var(--gy,0%),rgba(255,236,170,0.22),transparent 45%);}
+.gatsby-age{animation:pulseGold 2.6s ease-in-out infinite;}
+@keyframes pulseGold{0%,100%{box-shadow:0 0 20px rgba(212,175,55,0.3)}50%{box-shadow:0 0 38px rgba(212,175,55,0.7)}}
+.reveal{opacity:0;transform:translateY(34px) scale(.98);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1);}
+.reveal.in{opacity:1;transform:none;}
+.cd-num.flip{animation:flip .5s ease;}
+@keyframes flip{0%{transform:rotateX(90deg);opacity:.2}100%{transform:none;opacity:1}}
+.deco-card::after{content:"";position:absolute;left:50%;top:-1px;width:60px;height:2px;margin-left:-30px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.btn-deco{position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+.btn-deco:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,175,55,0.35);}
+.btn-deco::before{content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;
+  background:linear-gradient(110deg,transparent,rgba(255,255,255,0.45),transparent);animation:sweep 3.5s ease-in-out infinite;}
+@keyframes sweep{0%,60%{left:-120%}100%{left:140%}}
+#musicBtn{position:fixed;right:16px;bottom:16px;z-index:50;width:52px;height:52px;border-radius:50%;
+  border:2px solid var(--gold);cursor:pointer;display:none;align-items:center;justify-content:center;
+  background:repeating-radial-gradient(circle,#111 0 3px,#1c1c22 3px 5px);color:var(--gold);font-size:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.6);}
+#musicBtn.show{display:flex;}
+#musicBtn.playing{animation:spin 4s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+#fxConfetti{position:fixed;inset:0;z-index:2000;pointer-events:none;}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;}
+  .reveal{opacity:1;transform:none;}
+}
+</style>
+</head>
+<body class="locked">
+
+<canvas id="fxSparkles"></canvas>
+<canvas id="fxConfetti"></canvas>
+<div class="curtain l"></div><div class="curtain r"></div>
+<button id="musicBtn" type="button" aria-label="Música">♪</button>
+
+
+
+<audio id="bgAudio" loop preload="none"></audio>
+
+<div class="gate" id="gate">
+  <div class="gate-frame">
+    <div class="gate-kicker">✦ Great Celebration ✦</div>
+    <div class="gate-name">Mati G</div>
+    <div class="gate-sub">Una noche de gala, brindis y glamour. Elegí tu experiencia:</div>
+    <div class="gate-btns">
+      <button class="gate-btn" id="enterMusic">Ingresar con música ✦</button>
+      <button class="gate-btn ghost" id="enterSilent">Ingresar sin música</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  
+  <header class="gatsby-hero">
+    <div class="gatsby-tag">✦ The Golden Milestone ✦</div>
+    <h1 class="gatsby-name">Mati G</h1>
+
+
+    <div class="gatsby-age">24</div>
+    <div class="gatsby-tag" style="margin-top:4px;">Festejo mis 24/7</div>
+    <div class="gatsby-date">Sábado 17 de Octubre · 21:30 hs</div>
+  </header>
+
+  <section class="deco-card">
+    <h3>La Cuenta Regresiva</h3>
+    <div class="cd-grid">
+      <div class="cd-box"><div class="cd-num" id="dd">00</div><div class="cd-lbl">Días</div></div>
+      <div class="cd-box"><div class="cd-num" id="hh">00</div><div class="cd-lbl">Hs</div></div>
+      <div class="cd-box"><div class="cd-num" id="mm">00</div><div class="cd-lbl">Min</div></div>
+      <div class="cd-box"><div class="cd-num" id="ss">00</div><div class="cd-lbl">Seg</div></div>
+    </div>
+  </section>
+
+  <section class="deco-card">
+    <div style="font-size:22px;margin-bottom:4px;">🍸</div>
+    <h3>Lugar & Cocktail</h3>
+    <p style="font-size:16px;color:#fff;font-weight:700;">MARE by Fran</p>
+    <p>Av. Alicia Moreau de Justo 1170, CABA</p>
+    <p style="color:var(--gold);font-weight:700;margin-top:4px;">Puntual: 21:30 hs</p>
+    <a class="btn-deco" id="mapBtn" target="_blank" rel="noopener">✦ Ver Ubicación</a>
+    <a class="btn-deco ghost" id="agendarBtn" target="_blank" rel="noopener" style="margin-left:6px;">Agendar</a>
+  </section>
+
+  <section class="deco-card">
+    <h3>Confirmación de Asistencia</h3>
+    <p style="margin-bottom:12px;">Por favor confirmá tu asistencia para coordinar el catering:</p>
+    <div id="form">
+      <div class="field">
+        <label>Nombre y Apellido</label>
+        <input type="text" id="nombre" placeholder="Nombre completo" />
+      </div>
+      <div class="field">
+        <label>Invitados</label>
+        <input type="number" id="qty" value="1" min="1" max="10" />
+      </div>
+      <button class="btn-deco" style="width:100%;padding:14px;" id="send">Confirmar Asistencia ✦</button>
+    </div>
+    <div id="thanks" style="display:none;padding:12px 0;">
+      <div style="font-size:28px;">🥂</div>
+      <h4 style="font-family:'Cinzel',serif;font-size:20px;color:var(--gold);margin-top:4px;">¡Brindaremos juntos!</h4>
+      <p style="font-size:12px;color:#a0a0b0;">Tu lugar ha sido reservado.</p>
+    </div>
+  </section>
+
+
+
+  <footer class="footer">
+    Mati G · Festejo mis 24/7 · Sábado 17 de Octubre
+  </footer>
+
+</div>
+
+<script>
+const FECHA_EVENTO = "2026-10-17T21:30:00-03:00";
+const MAPS_QUERY   = "https://maps.app.goo.gl/L9YHEsutG5cGqJ8Z9";
+const SHEET_URL    = "https://script.google.com/macros/s/AKfycbw0C_Gepta0qjDW1N4Ww0QF_unjsKPfRKCP5ASuYYAQMpELYzD1r4TyB62uBFKoI7nJmA/exec";
+const MUSICA_URL   = "synth";
+
+if(document.getElementById('mapBtn')) document.getElementById('mapBtn').href = /^https?:/.test(MAPS_QUERY) ? MAPS_QUERY : "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(MAPS_QUERY);
+(function(){
+  const ag = document.getElementById('agendarBtn'); if(!ag) return;
+  const s = new Date(FECHA_EVENTO), e = new Date(s.getTime()+5*3600000), f = d => d.toISOString().replace(/[-:]|.d{3}/g,'');
+  ag.href = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(document.title) + "&dates=" + f(s) + "/" + f(e) + "&location=" + encodeURIComponent(document.querySelector('.deco-card p') ? "MARE by Fran, Av. Alicia Moreau de Justo 1170, CABA" : '');
+})();
+
+/* GATE & AUDIO */
+(function(){
+  const gate = document.getElementById('gate'), audio = document.getElementById('bgAudio');
+  if(audio && MUSICA_URL){ audio.src = MUSICA_URL; }
+  function openGate(withMusic){
+    if(withMusic && audio && MUSICA_URL){ audio.play().catch(()=>{}); }
+    if(gate) gate.classList.add('hide');
+    document.body.classList.remove('locked');
+  }
+  const em = document.getElementById('enterMusic');
+  if(em) em.onclick = function(){ openGate(true); };
+  const es = document.getElementById('enterSilent');
+  if(es) es.onclick = function(){ openGate(false); };
+})();
+
+/* SMART PASSES */
+(function(){
+  const p = new URLSearchParams(window.location.search);
+  const inv = p.get('invitado'), cup = p.get('cupos');
+  if(inv && document.querySelector('.gate-sub')) document.querySelector('.gate-sub').textContent = '¡Hola ' + inv + '! Tenés una invitación especial:';
+  if(cup && document.getElementById('qty')){
+    document.getElementById('qty').value = cup;
+    document.getElementById('qty').disabled = true;
+  }
+})();
+
+/* COUNTDOWN */
+const target = new Date(FECHA_EVENTO).getTime(), pad = n => String(n).padStart(2,'0');
+function tick(){
+  const diff = target - Date.now(), dd = document.getElementById('dd');
+  if(!dd) return;
+  if(diff<=0){
+    dd.textContent='00';
+    if(document.getElementById('hh')) document.getElementById('hh').textContent='00';
+    if(document.getElementById('mm')) document.getElementById('mm').textContent='00';
+    if(document.getElementById('ss')) document.getElementById('ss').textContent='00';
+    return;
+  }
+  dd.textContent = pad(Math.floor(diff/86400000));
+  if(document.getElementById('hh')) document.getElementById('hh').textContent = pad(Math.floor(diff%86400000/3600000));
+  if(document.getElementById('mm')) document.getElementById('mm').textContent = pad(Math.floor(diff%3600000/60000));
+  if(document.getElementById('ss')) document.getElementById('ss').textContent = pad(Math.floor(diff%60000/1000));
+}
+tick(); setInterval(tick,1000);
+
+/* RSVP */
+const sendBtn = document.getElementById('send');
+if(sendBtn){
+  sendBtn.onclick = async function(){
+    const nom = document.getElementById('nombre').value.trim();
+    if(!nom){ document.getElementById('nombre').focus(); return; }
+    const qty = document.getElementById('qty').value;
+    sendBtn.disabled = true; sendBtn.textContent = 'Enviando…';
+    try{
+      if(SHEET_URL && SHEET_URL.indexOf("URL_AQUI")===-1){
+        await fetch(SHEET_URL,{method:'POST',mode:'no-cors',body:JSON.stringify({tipo:"rsvp",nombre:nom,asiste:"Sí",cantidad:qty})});
+      }
+    }catch(e){}
+    document.getElementById('form').style.display = 'none';
+    document.getElementById('thanks').style.display = 'block';
+  };
+}
+
+/* POST EVENT TRIGGER */
+(function(){
+  const peOverlay = document.getElementById('postEventOverlay');
+  if(!peOverlay) return;
+  const isSimulated = false;
+  const eventTime = new Date(FECHA_EVENTO).getTime();
+  const hasPassed = Date.now() > eventTime;
+  if(isSimulated || hasPassed){
+    peOverlay.classList.remove('pe-hide');
+    const gate = document.getElementById('gate');
+    if(gate) gate.classList.add('hide');
+    const envGate = document.getElementById('envelopeGate');
+    if(envGate) envGate.classList.add('opened');
+    document.body.classList.remove('locked');
+  } else {
+    peOverlay.classList.add('pe-hide');
+  }
+  const dismiss = document.getElementById('peBtnDismiss');
+  if(dismiss){
+    dismiss.onclick = function(){
+      peOverlay.classList.add('pe-hide');
+    };
+  }
+})();
+
+
+
+/* SYNTH */
+(function(){
+  if(MUSICA_URL !== 'synth') return;
+  const audio = document.getElementById('bgAudio'); if(!audio) return;
+  audio.removeAttribute('src');
+  let ac = null, master = null, timer = null, paused = true, step = 0;
+  // Am - F - C - G  (voicings graves de órgano)
+  const chords = [[45,57,60,64],[41,53,57,60],[48,55,60,64],[43,55,59,62]];
+  const hz = m => 440*Math.pow(2,(m-69)/12);
+  function organ(m, t0, dur, vol){
+    [1,2,4].forEach((mult,i)=>{
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = i ? 'sine' : 'triangle'; o.frequency.value = hz(m)*mult;
+      g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(vol/(i+1), t0+2.2);
+      g.gain.setValueAtTime(vol/(i+1), t0+dur-2.2);
+      g.gain.linearRampToValueAtTime(0, t0+dur+.5);
+      o.connect(g).connect(master); o.start(t0); o.stop(t0+dur+.6);
+    });
+  }
+  function tick(m, t0){
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.value = hz(m);
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.05, t0+.01);
+    g.gain.exponentialRampToValueAtTime(.0001, t0+.9);
+    o.connect(g).connect(master); o.start(t0); o.stop(t0+1);
+  }
+  const BAR = 8; // segundos por acorde
+  function schedule(){
+    const t0 = ac.currentTime + .1, ch = chords[step % 4];
+    ch.forEach((m,i)=>organ(m, t0, BAR, i ? .045 : .06));
+    const top = [ch[2]+12, ch[3]+12];
+    for(let k=0;k<16;k++) tick(top[k%2], t0 + k*(BAR/16));
+    step++;
+  }
+  function start(){
+    if(!ac){
+      ac = new (window.AudioContext||window.webkitAudioContext)();
+      master = ac.createGain(); master.gain.value = .8;
+      // eco espacial
+      const d = ac.createDelay(), fb = ac.createGain(), lp = ac.createBiquadFilter();
+      d.delayTime.value = .45; fb.gain.value = .45; lp.type = 'lowpass'; lp.frequency.value = 2200;
+      master.connect(lp); lp.connect(ac.destination); lp.connect(d); d.connect(fb).connect(d); d.connect(ac.destination);
+    }
+    ac.resume();
+    if(!timer){ schedule(); timer = setInterval(schedule, BAR*1000); }
+  }
+  Object.defineProperty(audio, 'paused', { get: ()=>paused });
+  audio.play = function(){ start(); paused = false; audio.dispatchEvent(new Event('play')); return Promise.resolve(); };
+  audio.pause = function(){ if(ac) ac.suspend(); paused = true; audio.dispatchEvent(new Event('pause')); };
+})();
+/* FX-PRO */
+(function(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const audio = document.getElementById('bgAudio'), mb = document.getElementById('musicBtn');
+  function syncMusic(){ if(mb) mb.classList.toggle('playing', audio && !audio.paused); }
+  if(audio){ audio.addEventListener('play', syncMusic); audio.addEventListener('pause', syncMusic); }
+  if(mb && MUSICA_URL){
+    mb.onclick = function(){ if(audio.paused) audio.play().catch(()=>{}); else audio.pause(); };
+  }
+  function opened(){
+    document.body.classList.add('opened');
+    if(mb && MUSICA_URL) setTimeout(()=>mb.classList.add('show'), 1400);
+    setTimeout(()=>{ document.querySelectorAll('.curtain').forEach(c=>c.remove()); }, 1800);
+    if(!reduce) setTimeout(()=>burst(innerWidth/2, innerHeight*0.3, 90), 900);
+  }
+  ['enterMusic','enterSilent'].forEach(id=>{ const b=document.getElementById(id); if(b) b.addEventListener('click', opened); });
+  if(!document.getElementById('gate')) opened();
+
+  /* Partículas doradas */
+  const sc = document.getElementById('fxSparkles'), sx = sc.getContext('2d');
+  let W, H, parts = [];
+  function size(){ W = sc.width = innerWidth; H = sc.height = innerHeight; }
+  size(); addEventListener('resize', size);
+  for(let i=0;i<60;i++) parts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.8+.4,v:Math.random()*.35+.08,p:Math.random()*6.28});
+  function loop(){
+    sx.clearRect(0,0,W,H);
+    for(const s of parts){
+      s.y -= s.v; s.p += .03; if(s.y < -5){ s.y = H+5; s.x = Math.random()*W; }
+      const a = .35 + Math.sin(s.p)*.35;
+      sx.beginPath(); sx.arc(s.x + Math.sin(s.p)*6, s.y, s.r, 0, 6.28);
+      sx.fillStyle = 'rgba(245,214,120,'+a+')'; sx.shadowBlur = 8; sx.shadowColor = '#d4af37'; sx.fill();
+    }
+    requestAnimationFrame(loop);
+  }
+  if(!reduce) loop();
+
+  /* Confetti dorado */
+  const cc = document.getElementById('fxConfetti'), cx = cc.getContext('2d'); let conf = [], running = false;
+  function burst(x, y, n){
+    cc.width = innerWidth; cc.height = innerHeight;
+    const cols = ['#d4af37','#f5e0a3','#ffffff','#997a15'];
+    for(let i=0;i<n;i++){ const a=Math.random()*6.28, sp=Math.random()*9+3;
+      conf.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-5,w:Math.random()*7+4,h:Math.random()*4+2,r:Math.random()*6.28,vr:Math.random()*.3-.15,c:cols[i%4],life:120}); }
+    if(!running){ running = true; requestAnimationFrame(cloop); }
+  }
+  function cloop(){
+    cx.clearRect(0,0,cc.width,cc.height);
+    conf = conf.filter(p=>p.life-->0);
+    for(const p of conf){ p.vy += .22; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      cx.save(); cx.translate(p.x,p.y); cx.rotate(p.r); cx.globalAlpha = Math.min(1,p.life/40);
+      cx.fillStyle = p.c; cx.fillRect(-p.w/2,-p.h/2,p.w,p.h); cx.restore(); }
+    if(conf.length) requestAnimationFrame(cloop); else { running = false; cx.clearRect(0,0,cc.width,cc.height); }
+  }
+  const send = document.getElementById('send');
+  if(send) send.addEventListener('click', ()=>{
+    if(!document.getElementById('nombre').value.trim() || reduce) return;
+    const r = send.getBoundingClientRect(); burst(r.left+r.width/2, r.top, 140);
+  });
+
+  /* Aparición al scrollear */
+  const io = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold:.15});
+  document.querySelectorAll('.deco-card, .footer').forEach(el=>{ el.classList.add('reveal'); io.observe(el); });
+
+  /* Countdown con flip */
+  ['dd','hh','mm','ss'].forEach(id=>{
+    const el = document.getElementById(id); if(!el) return; let last = el.textContent;
+    new MutationObserver(()=>{ if(el.textContent!==last){ last = el.textContent; el.classList.remove('flip'); void el.offsetWidth; el.classList.add('flip'); } })
+      .observe(el, {childList:true, characterData:true, subtree:true});
+  });
+
+  /* Tarjeta principal con relieve 3D + brillo */
+  const hero = document.querySelector('.gatsby-hero');
+  if(hero && !reduce){
+    const g = document.createElement('div'); g.className = 'glare'; hero.appendChild(g);
+    function tilt(px, py){
+      hero.style.transform = 'perspective(800px) rotateX('+((.5-py)*10)+'deg) rotateY('+((px-.5)*12)+'deg)';
+      hero.style.setProperty('--gx', px*100+'%'); hero.style.setProperty('--gy', py*100+'%');
+    }
+    hero.addEventListener('mousemove', e=>{ const r = hero.getBoundingClientRect(); tilt((e.clientX-r.left)/r.width, (e.clientY-r.top)/r.height); });
+    hero.addEventListener('mouseleave', ()=>{ hero.style.transform = ''; });
+    addEventListener('deviceorientation', e=>{
+      if(e.gamma==null) return;
+      tilt(Math.max(0,Math.min(1,.5+e.gamma/60)), Math.max(0,Math.min(1,.5+(e.beta-45)/60)));
+    });
+  }
+})();
+</script>
+</body>
+</html>
